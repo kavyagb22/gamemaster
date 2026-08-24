@@ -2,12 +2,15 @@
 "use client";
 
 import { InputBox, SubmitButton } from "@/comp/common";
-import { Signup } from "@/models/user";
+import { apiPost } from "@/helpers/api";
+import { Signup, User } from "@/models/user";
+import { useAuth } from "@/providers/authContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { user, setUser } = useAuth();
   const [signup, setSignup] = useState<Signup>({
     firstname: "",
     lastname: "",
@@ -16,7 +19,43 @@ export default function SignupPage() {
     username: "",
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const signupUser = () => {};
+  const signupUser = async () => {
+    setLoading(true);
+    try {
+      const user = await apiPost<{ status: string; token: string; user: User }>(
+        "/auth/signup",
+        {
+          firstname: signup.firstname,
+          lastname: signup.lastname,
+          email: signup.email,
+          password: signup.password,
+          username: signup.username,
+        }
+      );
+      console.log("user: ", user);
+      setUser(user.user);
+      localStorage.setItem("token", user.token);
+      setLoading(false);
+      setSignup({
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+        username: "",
+      });
+      router.push("/main");
+    } catch (err) {
+      setLoading(false);
+      setSignup({
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+        username: "",
+      });
+      console.log("error: ", err);
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen bg-white text-black">
       <div className="flex flex-col gap-4 w-[50%]">

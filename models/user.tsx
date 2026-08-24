@@ -12,3 +12,12 @@ export type Signup = {
   password: string;
   email: string;
 };
+
+export type User = {
+  id: number;
+  firstname: string;
+  lastname: string;
+  username: string;
+  email: string;
+  createdAt: string;
+};

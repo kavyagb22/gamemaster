@@ -1,0 +1,5 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "prettier.requirePragma": true,
+    "prettier.insertPragma": true
+}

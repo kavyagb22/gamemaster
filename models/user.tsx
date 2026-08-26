@@ -20,4 +20,5 @@ export type User = {
   username: string;
   email: string;
   createdAt: string;
+  usertype: "host" | "player";
 };

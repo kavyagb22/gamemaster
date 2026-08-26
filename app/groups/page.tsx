@@ -10,9 +10,14 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function MainPage() {
-  const { user, loading } = useAuth();
+export default function GroupPage() {
+  const { user, setUser, loading } = useAuth();
   const router = useRouter();
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/signin");
+    }
+  }, [user, loading, router]);
 
   if (loading || !user) {
     return <LoadingSpinner />;
@@ -24,7 +29,7 @@ export default function MainPage() {
         <div className="w-[20%] border-r-1 border border-black h-screen">
           <Sidemenu />
         </div>
-        Main page
+        Group page
       </div>
     </div>
   );

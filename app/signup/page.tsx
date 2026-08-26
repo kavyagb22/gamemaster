@@ -1,16 +1,16 @@
 /** @format */
 "use client";
 
-import { InputBox, SubmitButton } from "@/comp/common";
+import { InputBox, LoadingSpinner, SubmitButton } from "@/comp/common";
 import { apiPost } from "@/helpers/api";
 import { Signup, User } from "@/models/user";
 import { useAuth } from "@/providers/authContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user, setUser, loading } = useAuth();
   const [signup, setSignup] = useState<Signup>({
     firstname: "",
     lastname: "",
@@ -18,9 +18,17 @@ export default function SignupPage() {
     password: "",
     username: "",
   });
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const [loadingData, setLoadingData] = useState<boolean>(false);
+  useEffect(() => {
+    if (user) {
+      router.push("/main");
+    }
+  }, [user, loading, router]);
+
   const signupUser = async () => {
-    setLoading(true);
+    setLoadingData(true);
+
     try {
       const user = await apiPost<{ status: string; token: string; user: User }>(
         "/auth/signup",
@@ -34,18 +42,23 @@ export default function SignupPage() {
       );
       console.log("user: ", user);
       setUser(user.user);
-      localStorage.setItem("token", user.token);
-      setLoading(false);
-      setSignup({
-        firstname: "",
-        lastname: "",
-        email: "",
-        password: "",
-        username: "",
-      });
-      router.push("/main");
+      if (user && user.token) {
+        localStorage.setItem("token", user.token);
+        setUser(user.user);
+        setLoadingData(false);
+        setSignup({
+          firstname: "",
+          lastname: "",
+          email: "",
+          password: "",
+          username: "",
+        });
+        router.push("/main");
+      } else {
+        console.error("No token returned from backend:", user);
+      }
     } catch (err) {
-      setLoading(false);
+      setLoadingData(false);
       setSignup({
         firstname: "",
         lastname: "",
@@ -56,6 +69,11 @@ export default function SignupPage() {
       console.log("error: ", err);
     }
   };
+
+  if (loading || user) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen bg-white text-black">
       <div className="flex flex-col gap-4 w-[50%]">

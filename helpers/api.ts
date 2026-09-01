@@ -60,3 +60,28 @@ export async function apiPost<T>(endpoint: string, body?: any): Promise<T> {
     }
     return response.json();
 }
+
+
+export async function apiPut<T>(endpoint: string, body?: any): Promise<T> {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: body ? JSON.stringify(body) : undefined
+    });
+
+    if (!response.ok) {
+        // 🛡️ Safe Extraction: Parse as text first to prevent JSON decode crashes
+        const errorText = await response.text();
+        let errorMessage = `PUT request failed with status ${response.status}`;
+        
+        try {
+            const parsedError = JSON.parse(errorText);
+            errorMessage = parsedError.detail || errorMessage;
+        } catch {
+            if (errorText) errorMessage = errorText;
+        }
+        
+        throw new Error(errorMessage);
+    }
+    return response.json();
+}

@@ -40,7 +40,7 @@ export default function Sidemenu() {
   const router = useRouter();
   const { logout } = useAuth();
   return (
-    <div>
+    <div className="">
       <div className="flex flex-col justify-between gap-2 h-screen">
         <div className="flex flex-col">
           <div className="flex flex-row gap-2 w-full text-center font-bold text-lg px-4 py-2">
@@ -63,7 +63,7 @@ export default function Sidemenu() {
           </div>
         </div>
         <div
-          className="flex flex-row gap-2 mx-2 px-2 rounded-md py-4 mb-[24px] hover:bg-red-200 cursor-pointer"
+          className="flex flex-row gap-2 mx-2 px-2 rounded-md py-4 mb-[24px] hover:bg-red-200 hover:text-red-800 cursor-pointer"
           onClick={() => {
             logout();
             router.push("/signin");

@@ -29,7 +29,7 @@ export default function CalendarPage() {
         <div className="w-[20%] border-r-1 border border-black h-screen">
           <Sidemenu />
         </div>
-        Calendar page
+        <div className="flex flex-col my-4 mx-8 w-full">Calendar page</div>
       </div>
     </div>
   );

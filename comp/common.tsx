@@ -8,24 +8,33 @@ export function InputBox({
   value,
   handleChangeAction,
   type = "text",
+  required = false,
+  error = "",
 }: {
   title: string;
   value: string | number | undefined;
   handleChangeAction: (value: any) => void;
   type?: "text" | "password" | "number" | "email";
+  required?: boolean;
+  error?: string;
 }) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const isPassword = type == "password";
   const inputType = isPassword && !showPassword ? type : "text";
   return (
     <div className="flex flex-col gap-1 w-full">
-      <div>{title}</div>
+      <div className="flex flex-row gap-1 items-center">
+        <div>{title}</div>
+        {required && <div className="text-red-500 font-bold text-xl">*</div>}
+      </div>
+
       <div className="flex flex-row">
         <input
           className="border border-gray-700 w-full h-8 rounded-md pl-2 pr-8"
           type={inputType}
-          value={value}
+          value={value === null ? "" : value}
           onChange={(e) => handleChangeAction(e.target.value)}
+          required={required}
         />
         {value !== "" && isPassword && (
           <button
@@ -37,6 +46,7 @@ export function InputBox({
           </button>
         )}
       </div>
+      <div className="text-sm text-red-600">{error}</div>
     </div>
   );
 }
@@ -54,7 +64,7 @@ export function SubmitButton({
     <button
       type="button"
       onClick={() => handleSubmitAction()}
-      className="cursor-pointer bg-gray-300 rounded-md h-10 py-2 border-black border justify-center items-center align-center w-full flex"
+      className="cursor-pointer bg-blue-700 text-white rounded-md h-10 py-2 border-black border justify-center items-center align-center w-full flex"
     >
       {!loading ? (
         title
@@ -109,6 +119,51 @@ export function CommonModal({
             onClick={() => setOpenModalAction(false)}
             className="cursor-pointer"
           />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function DeleteModal({
+  title,
+  setCloseModalAction,
+  desc = null,
+  deleteAction,
+  loadDelete,
+}: {
+  title: string;
+  setCloseModalAction: () => void;
+  desc?: string | null;
+  deleteAction: () => void;
+  loadDelete: boolean;
+}) {
+  return (
+    <div className="fixed top-0 left-0 w-full h-full bg-gray-800/75 flex items-center justify-center">
+      <div className="flex bg-white flex-col gap-4 p-4 md:w-[500px] xs:w-[300px] items-center">
+        <div className="flex flex-row justify-between items-center w-full">
+          <div />
+          <div className="font-bold text-lg">{title}</div>
+          <X onClick={() => setCloseModalAction()} className="cursor-pointer" />
+        </div>
+        <div className="text-black">{desc}</div>
+        <div className="flex flex-row justify-between w-full px-12">
+          <button
+            className="cursor-pointer rounded-md p-2 border-red-500 border min-w-[150px] text-red-500 hover:bg-red-200"
+            onClick={() => setCloseModalAction()}
+          >
+            No
+          </button>
+          <button
+            className="cursor-pointer rounded-md p-2 border-green-500 border min-w-[150px] text-green-500 hover:bg-green-200"
+            onClick={() => deleteAction()}
+          >
+            {loadDelete ? (
+              <Loader2 className="animate-spin justify-center" size={20} />
+            ) : (
+              "Yes"
+            )}
+          </button>
         </div>
       </div>
     </div>

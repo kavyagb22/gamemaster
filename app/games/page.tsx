@@ -3,19 +3,23 @@
 
 import {
   ButtonWithModal,
+  DeleteModal,
   InputBox,
   LoadingSpinner,
   SubmitButton,
 } from "@/comp/common";
-import GamesModal from "@/comp/games";
+import GamesModal from "@/comp/games/add";
+import { GameFurtherInfo, GameView } from "@/comp/games/common";
 import Sidemenu from "@/comp/sidemenu";
-import { apiGet } from "@/helpers/api";
-import { GameType, NewGame } from "@/models/games";
+import { apiGet, apiPost } from "@/helpers/api";
+import { GameInfo, GameType, NewGame } from "@/models/games";
+import { GameResponse } from "@/models/response";
 import { User } from "@/models/user";
 import { useAuth } from "@/providers/authContext";
-import { Loader2, Plus, Trash, X } from "lucide-react";
+import { Loader2, Plus, Trash, X, CircleArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const allTypes: GameType[] = [
   "cooperative",
@@ -29,16 +33,72 @@ const allTypes: GameType[] = [
 export default function GamesPage() {
   const { user, setUser, loading } = useAuth();
   const router = useRouter();
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [games, setGames] = useState<GameInfo[]>([]);
+  const [moreModal, setMoreModal] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [furtherInfo, setFurtherInfo] = useState<GameInfo | null>(null);
+  const [updateGame, setUpdateGame] = useState<GameInfo | null>(null);
+  const [deleteGame, setDeleteGame] = useState<GameInfo | null>(null);
+  const [loadDelete, setLoadDelete] = useState<boolean>(false);
   useEffect(() => {
     if (!loading && !user) {
       router.push("/signin");
     }
   }, [user, loading, router]);
 
+  const fetchGames = async () => {
+    try {
+      const response = await apiGet<{ status: string; data: GameResponse }>(
+        "/games/get"
+      );
+      console.log("get games: ", response);
+      setGames(response.data.games);
+    } catch (err: any) {
+      toast.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
   if (loading || !user) {
     return <LoadingSpinner />;
   }
-  const [openModal, setOpenModal] = useState<boolean>(false);
+
+  const isModalOpen = openModal || updateGame !== null;
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setUpdateGame(null);
+  };
+
+  const handleDeleteModal = () => {
+    setDeleteGame(null);
+  };
+
+  const handleDeleteGame = async () => {
+    setLoadDelete(true);
+    if (deleteGame === null) {
+      return;
+    }
+    try {
+      const response = await apiPost<{
+        status: string;
+        message: string;
+      }>("/games/delete", {
+        game_id: deleteGame.id,
+      });
+      toast.success(response.message);
+      setDeleteGame(null);
+      fetchGames();
+    } catch (err: any) {
+      toast.error(err);
+    } finally {
+      setLoadDelete(false);
+    }
+  };
 
   return (
     <div className="bg-white w-full h-screen text-black">
@@ -47,24 +107,68 @@ export default function GamesPage() {
           <Sidemenu />
         </div>
         <div className="flex flex-col my-4 mx-8 w-full">
-          <div className="flex flex-row justify-between">
-            <div></div>
+          <div className="flex flex-row justify-between items-center">
+            {furtherInfo !== null ? (
+              <div
+                className="cursor-pointer"
+                onClick={() => setFurtherInfo(null)}
+              >
+                <CircleArrowLeft size={30} />
+              </div>
+            ) : (
+              <div></div>
+            )}
             <button
               type="button"
               onClick={() => setOpenModal(!openModal)}
-              className="px-4 py-2 rounded-md border border-black flex flex-row items-center gap-2 cursor-pointer"
+              className="px-2 py-1 rounded-md border-3 border-black flex flex-row items-center gap-2 cursor-pointer font-bold"
             >
-              <Plus />
+              <Plus overlineThickness={3} />
               Add games
             </button>
           </div>
+          {furtherInfo !== null ? (
+            <div className="mt-8">
+              <GameFurtherInfo game={furtherInfo} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 mt-8 gap-4">
+              {" "}
+              {games.map((game, index) => (
+                <div key={index}>
+                  <GameView
+                    game={game}
+                    index={index}
+                    moreModal={moreModal}
+                    setMoreModalAction={setMoreModal}
+                    selectedIndex={selectedIndex}
+                    setSelectedIndexAction={setSelectedIndex}
+                    setFurtherInfoAction={setFurtherInfo}
+                    setUpdateGameAction={setUpdateGame}
+                    setDeleteGameAction={setDeleteGame}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {openModal && (
+      {isModalOpen && (
         <GamesModal
           openModal={openModal}
-          setOpenModalAction={setOpenModal}
+          setOpenModalAction={handleCloseModal}
           user={user}
+          onGameAddedAction={fetchGames}
+          gameInfo={updateGame}
+        />
+      )}
+      {deleteGame !== null && (
+        <DeleteModal
+          title={`Delete ${deleteGame.name}?`}
+          desc="Are you sure you want to delete this game?"
+          setCloseModalAction={handleDeleteModal}
+          deleteAction={handleDeleteGame}
+          loadDelete={loadDelete}
         />
       )}
     </div>

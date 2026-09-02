@@ -101,54 +101,56 @@ export default function GamesPage() {
   };
 
   return (
-    <div className="bg-white w-full h-screen text-black">
-      <div className="flex flex-row w-full">
-        <div className="w-[20%] border-r-1 border border-black h-screen">
-          <Sidemenu />
-        </div>
-        <div className="flex flex-col my-4 mx-8 w-full">
-          <div className="flex flex-row justify-between items-center">
-            {furtherInfo !== null ? (
-              <div
-                className="cursor-pointer"
-                onClick={() => setFurtherInfo(null)}
-              >
-                <CircleArrowLeft size={30} />
-              </div>
-            ) : (
-              <div></div>
-            )}
-            <button
-              type="button"
-              onClick={() => setOpenModal(!openModal)}
-              className="px-2 py-1 rounded-md border-3 border-black flex flex-row items-center gap-2 cursor-pointer font-bold"
+    <div className="bg-white w-full h-screen text-black flex flex-row overflow-hidden">
+      <div className="w-[200px] border-r-1 border border-black h-screen flex-shrink-0">
+        <Sidemenu />
+      </div>
+      <div className="flex flex-col py-4 px-8 w-full  h-screen overflow-hidden">
+        <div className="flex flex-row justify-between items-center flex-shrink-0">
+          {furtherInfo !== null ? (
+            <div
+              className="cursor-pointer"
+              onClick={() => setFurtherInfo(null)}
             >
-              <Plus overlineThickness={3} />
-              Add games
-            </button>
-          </div>
+              <CircleArrowLeft size={30} />
+            </div>
+          ) : (
+            <div></div>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpenModal(!openModal)}
+            className="px-2 py-1 rounded-md border-3 border-black flex flex-row items-center gap-2 cursor-pointer font-bold"
+          >
+            <Plus overlineThickness={3} />
+            Add games
+          </button>
+        </div>
+        <div className="mt-6 flex flex-col gap-2 flex-shrink-0">
           {furtherInfo !== null ? (
             <div className="mt-8">
               <GameFurtherInfo game={furtherInfo} />
             </div>
           ) : (
-            <div className="grid grid-cols-2 mt-8 gap-4">
-              {" "}
-              {games.map((game, index) => (
-                <div key={index}>
-                  <GameView
-                    game={game}
-                    index={index}
-                    moreModal={moreModal}
-                    setMoreModalAction={setMoreModal}
-                    selectedIndex={selectedIndex}
-                    setSelectedIndexAction={setSelectedIndex}
-                    setFurtherInfoAction={setFurtherInfo}
-                    setUpdateGameAction={setUpdateGame}
-                    setDeleteGameAction={setDeleteGame}
-                  />
-                </div>
-              ))}
+            <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-6">
+              <div className="grid grid-cols-2 gap-4">
+                {" "}
+                {games.map((game, index) => (
+                  <div key={index}>
+                    <GameView
+                      game={game}
+                      index={index}
+                      moreModal={moreModal}
+                      setMoreModalAction={setMoreModal}
+                      selectedIndex={selectedIndex}
+                      setSelectedIndexAction={setSelectedIndex}
+                      setFurtherInfoAction={setFurtherInfo}
+                      setUpdateGameAction={setUpdateGame}
+                      setDeleteGameAction={setDeleteGame}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

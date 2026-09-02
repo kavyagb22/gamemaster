@@ -9,7 +9,7 @@ import { Trash, X, Star, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-const allTypes: GameType[] = [
+export const allTypes: GameType[] = [
   "cooperative",
   "strategic",
   "party",
@@ -238,7 +238,7 @@ export default function GamesModal({
       onGameAddedAction();
     } catch (err: any) {
       console.error(err);
-      toast.error(err);
+      toast.error(err.message);
     } finally {
       setLoadingButton(false);
     }

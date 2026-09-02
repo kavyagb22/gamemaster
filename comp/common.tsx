@@ -10,6 +10,7 @@ export function InputBox({
   type = "text",
   required = false,
   error = "",
+  desc = "",
 }: {
   title: string;
   value: string | number | undefined;
@@ -17,6 +18,7 @@ export function InputBox({
   type?: "text" | "password" | "number" | "email";
   required?: boolean;
   error?: string;
+  desc?: string;
 }) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const isPassword = type == "password";
@@ -46,6 +48,7 @@ export function InputBox({
           </button>
         )}
       </div>
+      {desc !== "" && <div className=" text-sm text-gray-500">{desc}</div>}
       <div className="text-sm text-red-600">{error}</div>
     </div>
   );
@@ -166,6 +169,34 @@ export function DeleteModal({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function Tooltip({
+  text = null,
+  children,
+}: {
+  text?: string | null;
+  children: React.ReactNode;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      {children}
+      {visible && text && (
+        <div className="absolute bottom-full top-10 left-1/2 -translate-x-1/2 mb-2 z-20 pointer-events-none flex flex-col items-center w-max">
+          <div className=" text-md px-2 py-1 rounded shadow-md font-normal bg-black text-white">
+            {text}
+          </div>
+          <div className="w-2 h-2 bg-black rotate-45 -mt-1" />
+        </div>
+      )}
     </div>
   );
 }

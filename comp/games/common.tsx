@@ -6,7 +6,7 @@ import { GameInfo } from "@/models/games";
 import { Pen, Ellipsis, Trash, Info, Star, Zap } from "lucide-react";
 import { useState } from "react";
 
-function Ratings({
+export function Ratings({
   general = true,
   value,
   max,
@@ -114,11 +114,11 @@ export function GameView({
       </div>
       <div className="flex flex-col mt-2">
         <div className="underline mb-2">Game type</div>{" "}
-        <div className="grid grid-cols-4 gap-8 ">
+        <div className="grid grid-cols-4 gap-2 ">
           {game.gametype.map((item, index) => (
             <div
               key={index}
-              className="flex bg-green-200 rounded-full border border-black px-4 w-max justify-center"
+              className="flex bg-green-200 rounded-full border border-black px-4 justify-center"
             >
               {item}
             </div>
